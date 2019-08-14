@@ -1,0 +1,44 @@
+This document describes how run ppiGReMLIN. ppiGReMLIN is a scalable graph based strategy which models
+protein-protein interfaces as graphs.
+
+PREREQUISITES
+
+ppiGReMLIN requires Python 3.4.3 or above along with a few Python packages, which can be found in the
+file "requirements.txt".
+
+DEFAULT FILES
+
+atom_types.csv: contains the pyhsicochemical properties of atoms from each of the 20 amino acid residues
+used in contact prospection.
+interactions.csv: interatomic distance criteria used to compute interactions. Specifies the distance
+range for each interaction as well as the atoms properties.
+
+RUN PPIGREMLIN
+
+1.	Create a file containing a list of the  PDB ID's of the structures to be used as input to ppiGReMLIN,
+each line containing a single PDB ID along with the chains to be used in contact calculation.
+
+Example: structure 1EJM (CRYSTAL STRUCTURE OF THE BPTI ALA16LEU MUTANT IN COMPLEX WITH BOVINE TRYPSIN)
+contains 6 chains named from A to F. The chain pairs (A,B), (C,D) and (E,F), each represent a
+protease-inhibitor complex, from which we want to prospect contacts in the interfaces. The line entry in
+the file for this PDB strucuture would be as following:
+
+1EJM,A,B,C,D,E,F
+
+By default the program will search PDB for the structures at the input list and download them.
+Alternatively, the user can place the structures in the "pdbs" directory.
+
+Files "soybean.txt" and "bcl.txt" are the input files for the Serine protease and BCL-2 sample datasets
+respectively.
+
+2.	In Terminal, from the ppiGReMLIN directory, run:
+
+	$ python main.py <pdbidsfile> <directory>
+
+		<pdbidsfile>: the file contaning the PDB ids from the strucutures used as input
+		<directory>: name of subdirectory in ppiGReMLIN to place the results
+
+Data generated for ppiGReMLIN visualization tool will be placed in a directory called "data", inside
+the results directory specified.
+
+

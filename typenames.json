@@ -1,0 +1,14 @@
+{
+	"ACP": "Acceptor",
+	"DON": "Donor",
+	"POS": "Positive",
+	"NEG": "Negative",
+	"HPB": "Hydrophobic",
+	"ARM": "Aromatic",
+	"HYDROPHOBIC":"Hydrophobic",
+	"SALT_BRIDGE":"Salt bridge",
+	"ARM_STACK": "Aromatic",
+	"H_BOND": "Hydrogen bond",
+	"REPULSIVE": "Repulsive",
+	"SS_BRIDGE": "Disulfide Bridge"
+}
