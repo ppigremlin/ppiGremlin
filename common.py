@@ -193,6 +193,16 @@ def read_clusters(clusters,graphs,path=""):
 		graphs_dict[key] = graphs_dict.get(key,[]) + [graph]
 
 	return graphs_dict
+
+def fill_label_set(label_set):
+	max_label = max(label_set)
+	i = 1
+
+	new_labels = set(label_set)
+	while i < max_label:
+		new_labels.add(i)
+		i*=2
+	return sorted(list(new_labels))
 			
 if __name__ == '__main__':
 	###################### TypeCode Test

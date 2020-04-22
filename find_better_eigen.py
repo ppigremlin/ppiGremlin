@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import contacts as ct
-import graphprocessing as gs
+import graphProcess as gs
 import clustering as cl
 import graphmining as gm
 import common as cm
@@ -18,6 +18,7 @@ import time
 				  
 import networkx as nx
 import numpy as np
+import plot as pl
 from sklearn.metrics import calinski_harabaz_score,davies_bouldin_score,silhouette_score
 
 import eigen_gap as eg
@@ -31,7 +32,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib.cm as plcm
 
-def plot_eigen_gap(max_gap_connected,var_comp,dataset="",d_name="",adjust=True):
+def plot_eigen_gap(max_gap_connected,var_comp,dataset="",fancy="",adjust=True):
 	
 	if len(max_gap_connected) == len(var_comp) - 1:
 		var_comp = var_comp[1:]
@@ -50,7 +51,7 @@ def plot_eigen_gap(max_gap_connected,var_comp,dataset="",d_name="",adjust=True):
 	fig, ax = plt.subplots()
 	ax.set_xlabel("Number of components d of reduced matrix")
 	ax.set_ylabel("Number of clusters n")
-	ax.set_title("Optimal number of clusters for " + dataset + " dataset")
+	ax.set_title("Optimal number of clusters for " + fancy + " dataset")
 	
 	X = list(filter(lambda x: x[1] > 0.95,zip(data.items(),var_comp)))
 	X = {k:v for k,v in [j[0] for j in X]}
@@ -69,9 +70,9 @@ def plot_eigen_gap(max_gap_connected,var_comp,dataset="",d_name="",adjust=True):
 	ax2 = ax.twinx()
 	knb = ax2.scatter(data.keys(),k_neighbors,c="gray",marker="D")
 	ax2.set_ylabel("K-neighbors")
-	# if adjust:
-	# 	ax.set_ylim((0,18))
-	# 	ax2.set_ylim((1,500))
+	if adjust:
+		ax.set_ylim((0,18))
+		ax2.set_ylim((1,500))
 
 	ax.legend((a95,b95,knb),("d > 95%","d < 95%",'k_neighbors'))
 
@@ -120,10 +121,10 @@ def plot_max_gap(x,y,y2,labels=None,show=True,save=False,fname="",path=""):
 
 if __name__ == '__main__': 
 	sys.stdout.flush()
-	interactions,int_list = ct.readInteractions("interactions.csv")
+	interactions,int_list = ct.readInteractions("entrada2.csv")
 	a_types,a_type_list = ct.readAtom_Types("atom_types.csv")
 
-	typeCode = cm.TypeCode(a_type_list,int_list)
+	mask = cm.TypeCode(a_type_list,int_list)
 
 	path = Path(sys.argv[1])
 	eigen_path = path/'eigen_gap'
@@ -192,22 +193,22 @@ if __name__ == '__main__':
 
 	for n_components in cl_range:
 
-		# dir_path = Path(path)/("%d/"%(n_components))
+		dir_path = Path(path)/("%d/"%(n_components))
 		
-		# dir_path.mkdir(parents=True,exist_ok=True)
+		dir_path.mkdir(parents=True,exist_ok=True)
 		
-		# status_file = dir_path/"status.csv"
+		status_file = dir_path/"status.csv"
 
-		# status_file = status_file.open(mode='w')
-		# status_file.write("n_components %d\n"%n_components)
+		status_file = status_file.open(mode='w')
+		status_file.write("n_components %d\n"%n_components)
 		
 		
 		analytics = []
 		neighbors = []
 		
 		data_matrix = svd.getReduced(n_components)
-		# red_matrix_file = dir_path/'data.csv'
-		# svd.saveReduced(n_components,file=red_matrix_file)
+		red_matrix_file = dir_path/'data.csv'
+		svd.saveReduced(n_components,file=red_matrix_file)
 
 
 		for factor in np.arange(0.01,0.91,0.01):
@@ -216,7 +217,7 @@ if __name__ == '__main__':
 			neighbors.append(n_neighbors)
 			#print(n_neighbors)
 			n_cluster, connected = eg.calculate_gap(data_matrix,
-											n_neighbors=n_neighbors)
+											n_neighbors=n_neighbors,path=dir_path)
 			analytics.append([int(n_cluster),connected,n_neighbors])
 			if connected:
 				break
@@ -232,15 +233,16 @@ if __name__ == '__main__':
 		
 		analytics = {'analytics':analytics, 'n_neighbors':neighbors, 'n_components': n_components}
 
-		# with (dir_path / 'analytics.json' ).open(mode='w') as out_analytics:
-		# 	json.dump(analytics,out_analytics,indent=4)
+		with (dir_path / 'analytics.json' ).open(mode='w') as out_analytics:
+			json.dump(analytics,out_analytics,indent=4)
 		
 	with (Path(path) / 'analytics.json' ).open(mode='w') as out_analytics:
 			json.dump({'max_gap':max_gap, 'max_gap_connected':max_gap_connected},out_analytics,indent=4)
 
 	with cm.cd(path):
 		join_labels = True
-		dataset = pdbids_file.split(".")[0]
+		fancy = ("Joined" if join_labels else "")
+		dataset = pdbids_file.split(".")[0] + "_" + (fancy[0]) + ("_T" if join_labels else "_F")
 
-		#plot_max_gap(cl_range,max_gap,max_gap_connected,save=True,show=False,fname="eigen_summary.png")
-		plot_eigen_gap(max_gap_connected,var_comp,d_name="",dataset=dataset,adjust=False)
+		plot_max_gap(cl_range,max_gap,max_gap_connected,save=True,show=False,fname="eigen_summary.png")
+		plot_eigen_gap(max_gap_connected,var_comp,fancy=fancy,dataset=dataset,adjust=False)

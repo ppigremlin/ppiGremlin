@@ -1,6 +1,7 @@
 import sys, numpy as np
 import logging
 import networkx as nx
+import common as cm
 
 from Bio.PDB import NeighborSearch
 from pathlib import Path
@@ -189,6 +190,9 @@ def gen_graphs(contacts,typeCode,gfilename="graphs.txt",path=""):
 	node_labels = sorted(node_labels)
 	edge_labels = sorted(edge_labels)
 
+	edge_labels = cm.fill_label_set(edge_labels)
+	node_labels = cm.fill_label_set(node_labels)
+	
 	return graphs, node_labels, edge_labels
 
 def gen_graph(contacts,pdbid,typeCode):

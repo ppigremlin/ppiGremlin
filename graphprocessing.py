@@ -12,6 +12,8 @@ def print_graph(g):
 	print(g.edges.data('type'))
 	print("Edges:",g.edges)
 
+	...
+
 def read_graphs(filename,path=""):
 
 	graphs = []
@@ -35,6 +37,9 @@ def read_graphs(filename,path=""):
 
 	node_labels = sorted(list(node_labels))
 	edge_labels = sorted(list(edge_labels))
+	
+	edge_labels = cm.fill_label_set(edge_labels)
+	node_labels = cm.fill_label_set(node_labels)
 	
 	for g in graphs:
 		g.graph['node_map'] = {k:v for v,k in enumerate(sorted(g.nodes()))}
@@ -124,6 +129,13 @@ def genCountMatrix(graphs,node_labels,edge_labels,typeCode,matrix_type="full",me
 	return count_matrix	
 
 def multigraph_to_gspan(graphs,node_labels,edge_labels,mask,gspan_fname="entry.gsp"):
+	# print("Debug multigraph_to_gspan")
+	# print('Edge labels')
+	# print(edge_labels)
+	edge_labels = cm.fill_label_set(edge_labels)
+	# print('New edge labels')
+	# print(edge_labels)
+	node_labels = cm.fill_label_set(node_labels)
 	graphs_holder = graphs
 	graphs = []
 	node_map = None
@@ -155,7 +167,7 @@ def multigraph_to_gspan(graphs,node_labels,edge_labels,mask,gspan_fname="entry.g
 		for j in graphs[i].edges(data=True):
 			ml = len(mask.code(j[2]["type"]))
 			for l in mask.code(j[2]["type"]):
-
+				#print(j[0],j[1],l)
 				temp_str1 += ["e %d %d %d\n" % (j[0],j[1],edge_labels[l])]
 				
 		temp_str += "".join(temp_str1)

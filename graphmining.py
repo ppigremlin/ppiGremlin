@@ -67,7 +67,7 @@ def read_gSpan_results(node_labels,edge_labels,filename="gSpan.fp",path=""):
 			for filename in files:
 				key = filename.split('_')[1].split('f')[0][:-1]
 				temp_results[key] = gp.gspan_to_graph(filename,node_labels,edge_labels)
-				os.remove(filename)
+			
 			gSpan_results[int(cluster)] = temp_results
 	return gSpan_results,supports
 	
@@ -244,11 +244,12 @@ def mapGraphs(clusters,patterns,supports,path=""):
 	cluster_idx = 0
 	for p_graphs,graphs in zip(patterns,clusters):
 		for min_sup, p_graphs in sorted(p_graphs.items(),key=lambda x: float(x[0])):
-			for p in p_graphs:
+			for ip,p in enumerate(p_graphs):
 				
 				pl = gp.line_graph(p)
 				str0 = ""
 				for s in p.graph['ocur']:
+					#print(min_sup,ip,s)
 
 					g = graphs[int(s)]
 					gl = g.graph["l_graph"]
@@ -349,12 +350,13 @@ def jsonParse(clusters,patterns,atom_types,supports,type_code,typenames,path="")
 		'HPB' : 7,
 		'POS' : 11,
 		'NEG' : 13,
-		"HYDROPHOBIC": 23,
-		"SALT_BRIDGE": 19,
-		"ARM_STACK": 17,
-		"H_BOND": 29,
-		"REPULSIVE": 31,
-		"SS_BRIDGE": 37
+		'SSB' :	17,
+		"HYDROPHOBIC": 29,
+		"SALT_BRIDGE": 23,
+		"ARM_STACK": 19,
+		"H_BOND": 31,
+		"REPULSIVE": 37,
+		"SS_BRIDGE": 41
 	}
 
 	bin_to_prime = {
@@ -561,14 +563,50 @@ def maximalCount(patterns,node_labels,edge_labels,typenames,type_code,path=""):
 	filename = 'count_atoms_and_interactions.csv'
 	fpath = str(path/filename)
 
+	
+	p_edge_labels = set()
+	p_node_labels = set()
+	for g_patterns in patterns:
+		for sup, s_group in g_patterns.items():
+			for p in s_group:
+				p_edge_labels |= set(nx.get_edge_attributes(p,'type').values())
+				p_node_labels |= set(nx.get_node_attributes(p,'type').values())
+	
+	p_edge_labels = sorted(list(p_edge_labels))
+	node_labels = sorted(list(p_node_labels))
+	#print(p_edge_labels)
+	
+	i = 1
 	edge_single_labels = []
-	i = edge_labels[0]
-	for j in edge_labels:
-		if(i == j):
+	while i < max(p_edge_labels):
+		if i in p_edge_labels:
 			edge_single_labels.append(i)
-			i = i << 1
+		i = i << 1
 
+	print(node_labels)
+	print(edge_single_labels)
+	
+	# edge_single_labels = []
+	# i = edge_labels[0]
+	# for j in edge_labels:
+	# 	if(i == j):
+	# 		edge_single_labels.append(i)
+	# 		i = i << 1
 
+	# edge_single_labels = []
+	# i = edge_labels[0]
+	# for j in edge_labels:
+	# 	if(i == j):
+	# 		edge_single_labels.append(i)
+	# 		i = i << 1
+
+	#print(patterns)
+	
+
+	#print(p_edge_labels)
+
+	#exit()
+	
 	labels = { k:v for v,k in enumerate(node_labels + edge_single_labels,2)}
 	columns = len(labels)
 
