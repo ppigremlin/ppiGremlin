@@ -10,5 +10,6 @@
 	"ARM_STACK": "Aromatic",
 	"H_BOND": "Hydrogen bond",
 	"REPULSIVE": "Repulsive",
-	"SS_BRIDGE": "Disulfide Bridge"
+	"SS_BRIDGE": "Disulfide Bridge",
+	"SSB": "Single-stranded DNA-binding proteins"
 }
